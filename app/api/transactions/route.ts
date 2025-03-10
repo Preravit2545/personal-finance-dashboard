@@ -2,14 +2,14 @@ import { NextResponse } from "next/server";
 import { Transaction } from "@/app/models/Transaction";
 import { connectDB } from "@/app/lib/mongodb";
 
-{/*
+
 export async function GET() {
   await connectDB();
   const transactions = await Transaction.find({});
   return NextResponse.json(transactions);
 }
-*/}
 
+{/*
 export async function GET(req: Request) {
   await connectDB();
 
@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   const total = await Transaction.countDocuments();
 
   return NextResponse.json({ transactions, total });
-}
+}*/}
 
 
 export async function POST(req: Request) {

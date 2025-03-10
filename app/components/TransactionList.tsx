@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
 
 type Transaction = {
   _id: string;
@@ -20,13 +19,12 @@ export default function TransactionList() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [page]);
+  }, []);
 
   const fetchTransactions = async () => {
-    const res = await fetch(`/api/transactions?page=${page}&limit=${limit}`);
+    const res = await fetch(`/api/transactions`);
     const data = await res.json();
-    setTransactions(data.transactions);
-    setTotal(data.total);
+    setTransactions(data)
   };
 
   const deleteTransaction = async (id: string) => {
@@ -56,21 +54,11 @@ export default function TransactionList() {
           {transactions.map((transaction) => (
             <div key={transaction._id} className="flex justify-between items-center bg-gray-700 p-4 rounded-lg shadow-md">
               <div className="flex items-center gap-3">
-                {editingTransaction?._id === transaction._id ? (
-                  <input
-                    type="text"
-                    className="bg-gray-600 text-white p-2 rounded"
-                    value={editingTransaction.name}
-                    onChange={(e) => setEditingTransaction({ ...editingTransaction, name: e.target.value })}
-                  />
-                ) : (
                   <div>
                     <p className="text-white font-medium">{transaction.name}</p>
                     <p className="text-gray-400 text-sm">{transaction.date}</p>
                   </div>
-                )}
               </div>
-
               <div className="flex items-center gap-4">
                 <p className={`font-bold ${transaction.amount.startsWith("+") ? "text-green-400" : "text-red-400"}`}>
                   {transaction.amount}
@@ -86,25 +74,6 @@ export default function TransactionList() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
-        <button 
-          onClick={() => setPage(page - 1)} 
-          disabled={page === 1} 
-          className={`px-4 py-2 rounded-lg ${page === 1 ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
-        >
-          Previous
-        </button>
-        <p className="text-white">Page {page} of {Math.ceil(total / limit)}</p>
-        <button 
-          onClick={() => setPage(page + 1)} 
-          disabled={page * limit >= total} 
-          className={`px-4 py-2 rounded-lg ${page * limit >= total ? "bg-gray-600 text-gray-400 cursor-not-allowed" : "bg-gray-700 hover:bg-gray-600 text-white"}`}
-        >
-          Next
-        </button>
       </div>
     </div>
   );
