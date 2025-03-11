@@ -59,7 +59,7 @@ export default function TransactionList() {
               </div>
               <div className="flex items-center gap-4">
                 <p className={`font-bold ${parseFloat(transaction.amount) < 0 ? "text-red-400" : "text-green-400"}`}>
-                  {transaction.amount}
+                  {transaction.amount} ฿
                 </p>
                 <span className={`px-3 py-1 text-xs rounded-lg ${transaction.status === "Success" ? "bg-green-500/20 text-green-400"
                   : transaction.status === "Pending" ? "bg-yellow-500/20 text-yellow-400"
