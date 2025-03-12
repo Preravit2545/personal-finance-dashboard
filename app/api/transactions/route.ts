@@ -7,9 +7,9 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");
-  if (!userId) return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+  if (!userId) return NextResponse.json({ error: "User ID is required" },{ status: 400 });
 
-  const transactions = await Transaction.find({ userId }).populate("category");
+  const transactions = await Transaction.find({ userId });
   return NextResponse.json(transactions);
 }
 
