@@ -6,17 +6,24 @@ import Card from "../components/Card";
 import Navbar from "../components/Navbar";
 import Chart from "../components/Chart";
 import TransactionList from "../components/TransactionList";
+import { fetchAccount, fetchTransactions } from "../lib/apiutil";
 
-type Balance = {
+type Account ={
+  _id: string;
+  name: string;
   balance: number;
+  type: string;
+  userId: string;
 }
 
 type Transactions = {
   _id: string;
   name: string;
-  date: string;
-  amount: string;
+  date: Date;
+  type: string;
+  amount: number;
   status: "Success" | "Pending" | "Failed";
+  createdAt: Date;
   category: {
     icon: string;
   };
@@ -24,58 +31,29 @@ type Transactions = {
 
 export default function Dashboard() {
 
-  const [balance, setBalance] = useState<Balance[]>([]);
+  const [balance, setBalance] = useState<number>(0);
   const [income, setIncome] = useState<Transactions[]>([]);
   const [expense, setExpense] = useState<Transactions[]>([]);
+  const [account, setAccount] = useState<Account[]>([]);
+  const [transactions, setTransactions] = useState<Transactions[]>([]);
 
-  const fetchBalance = async () => {
-    try {
-      const res = await fetch(`/api/accounts?userId=67d03cffc6788dcdbf4e0598`);
-      const data = await res.json();
-      if (res.ok) {
-        const totalBalance = data.reduce((acc: number, account: any) => acc + account.balance, 0);
-        setBalance(totalBalance);
-      }
-    } catch (error) {
-      console.error("Error fetching account balance:", error);
-    }
-  };
-
-  const fetchIncome = async () => {
-    try {
-      const res = await fetch(`/api/transactions?userId=67d03cffc6788dcdbf4e0598`);
-      const data = await res.json();
-      if (res.ok) {
-        const totalIncome = data
-          .filter((transaction: any) => transaction.type === "income" && transaction.status === "Success")
-          .reduce((acc: number, transaction: any) => acc + parseFloat(transaction.amount), 0);
-        setIncome(totalIncome);
-      }
-    } catch (error) {
-      console.error("Error fetching income:", error);
-    }
-  };
-
-  const fetchExpense = async () => {
-    try {
-      const res = await fetch(`/api/transactions?userId=67d03cffc6788dcdbf4e0598`);
-      const data = await res.json();
-      if (res.ok) {
-        const totalExpense = data
-          .filter((transaction: any) => transaction.type === "expense" && transaction.status === "Success")
-          .reduce((acc: number, transaction: any) => acc + parseFloat(transaction.amount), 0);
-        setExpense(totalExpense);
-      }
-    } catch (error) {
-      console.error("Error fetching income:", error);
-    }
-  };
+  const userId = "67d03cffc6788dcdbf4e0598"; 
 
   useEffect(() => {
-    fetchBalance();
-    fetchIncome();
-    fetchExpense();
-  }, []);
+    const fetchUserAccount = async () => {
+      const accounts = await fetchAccount(userId);
+      setBalance(accounts.reduce((acc: number, account: Account) => acc + account.balance, 0));
+    }
+
+    const fetchUserTransactions = async () => {
+      const transactions = await fetchTransactions(userId);
+      setIncome(transactions.filter((transaction: Transactions) => transaction.type === "income" && transaction.status === "Success").reduce((acc: number, transaction: Transactions) => acc + transaction.amount, 0));
+      setExpense(transactions.filter((transaction: Transactions) => transaction.type === "expense" && transaction.status === "Success").reduce((acc: number, transaction: Transactions) => acc + transaction.amount, 0));
+    }
+
+    fetchUserTransactions();
+    fetchUserAccount();
+  }, [userId]);
 
 
   return (

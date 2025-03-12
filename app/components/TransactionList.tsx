@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchTransactions } from "../lib/apiutil";
 
 type Transaction = {
   _id: string;
@@ -16,20 +17,18 @@ type Transaction = {
 export default function TransactionList() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-
-  const fetchTransactions = async () => {
-    const res = await fetch(`/api/transactions?userId=67d03cffc6788dcdbf4e0598`);
-    const data = await res.json();
-    setTransactions(data)
-  };
+  const userId = "67d03cffc6788dcdbf4e0598";
 
   useEffect(() => {
-    fetchTransactions();
+    const fetchUserTransactions = async () => {
+      setTransactions(await fetchTransactions(userId));
+    }
+    fetchUserTransactions();
   }, []);
 
   const deleteTransaction = async (id: string) => {
     await fetch(`/api/transactions/${id}`, { method: "DELETE" });
-    fetchTransactions(); // โหลดข้อมูลใหม่
+
   };
 
   const saveTransaction = async () => {
@@ -39,7 +38,6 @@ export default function TransactionList() {
       body: JSON.stringify(editingTransaction),
     });
     setEditingTransaction(null);
-    fetchTransactions();
   };
 
   return (
@@ -54,7 +52,7 @@ export default function TransactionList() {
                 <p className="text-3xl">{transaction.category.icon}</p>
                 <div>
                   <p className="text-white font-medium">{transaction.name}</p>
-                    <p className="text-gray-400 text-sm">{new Date(transaction.date).toLocaleDateString()} {new Date(transaction.date).toLocaleTimeString()}</p>
+                  <p className="text-gray-400 text-sm">{new Date(transaction.date).toLocaleDateString()} {new Date(transaction.date).toLocaleTimeString()}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
